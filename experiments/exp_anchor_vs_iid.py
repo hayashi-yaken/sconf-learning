@@ -15,7 +15,11 @@ Saves per-epoch test accuracy to a CSV file.
 import argparse
 import csv
 import os
+import sys
 import warnings
+
+# Add project root to sys.path so that `src` is importable
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 import torch
