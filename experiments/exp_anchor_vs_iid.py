@@ -21,9 +21,7 @@ import numpy as np
 import torch
 
 from src.data import prepare_mnist_data
-from src.models import mlp_model
-from src.losses import Sconf_loss
-from src.engine import accuracy_check
+from src.engine import train_sconf_one_run
 from src.utils import save_training_curves
 
 warnings.filterwarnings("ignore")
@@ -97,50 +95,21 @@ v_train_loader, sconf_loader, test_loader, sd_loader, pair_loader, prior = prepa
 )
 
 # ---------------------------------------------------------------------------
-# Model and optimizer
+# Training
 # ---------------------------------------------------------------------------
-model = mlp_model(input_dim=28 * 28, hidden_dim=500, output_dim=1).to(device)
-optimizer = torch.optim.Adam(
-    model.parameters(), weight_decay=args.weight_decay, lr=args.learning_rate
+results = train_sconf_one_run(
+    sconf_loader=sconf_loader,
+    test_loader=test_loader,
+    prior=prior,
+    method=args.method,
+    lr=args.learning_rate,
+    weight_decay=args.weight_decay,
+    epochs=args.epochs,
 )
 
-# ---------------------------------------------------------------------------
-# Training loop
-# ---------------------------------------------------------------------------
-results = []  # list of {'epoch', 'train_loss', 'test_accuracy'}
-
-test_accuracy = accuracy_check(loader=test_loader, model=model).to("cpu")
-print(f"Epoch: 0. Train Loss: -      Test Accuracy: {test_accuracy.numpy()[0]:.2f}%")
-results.append({'epoch': 0, 'train_loss': float('nan'), 'test_accuracy': float(test_accuracy.numpy()[0])})
-
-for epoch in range(1, args.epochs):
-    # Learning rate schedule (mirrors demo.py)
-    if epoch == 20:
-        for pg in optimizer.param_groups:
-            pg['lr'] /= 10
-    if epoch == 40:
-        for pg in optimizer.param_groups:
-            pg['lr'] /= 10
-
-    model.train()
-    total_loss, n_batches = 0.0, 0
-    for images, sconf in sconf_loader:
-        images, sconf = images.to(device), sconf.to(device)
-        optimizer.zero_grad()
-        outputs = model(images).to(device)
-        loss = Sconf_loss(f=outputs, prior=prior, sconf=sconf, loss_name=args.method)
-        loss.backward()
-        optimizer.step()
-        total_loss += loss.item()
-        n_batches += 1
-    train_loss = total_loss / n_batches
-
-    model.eval()
-    with torch.no_grad():
-        test_accuracy = accuracy_check(loader=test_loader, model=model).to("cpu")
-        acc = float(test_accuracy.numpy()[0])
-    print(f"Epoch: {epoch}. Train Loss: {train_loss:.4f}  Test Accuracy: {acc:.2f}%")
-    results.append({'epoch': epoch, 'train_loss': train_loss, 'test_accuracy': acc})
+for r in results:
+    loss_str = f"{r['train_loss']:.4f}" if not (r['train_loss'] != r['train_loss']) else '-'
+    print(f"Epoch: {r['epoch']:3d}. Train Loss: {loss_str:>8s}  Test Accuracy: {r['test_accuracy']:.2f}%")
 
 # ---------------------------------------------------------------------------
 # Save results to CSV
