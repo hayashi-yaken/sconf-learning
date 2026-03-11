@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import torch
 
+from src.device import device
 from src.data import prepare_mnist_data
 from src.engine import train_sconf_one_run
 from src.utils import save_training_curves
@@ -70,7 +71,6 @@ np.random.seed(args.seed)
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed_all(args.seed)
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = True
 

@@ -1,13 +1,13 @@
 import torch
 import torch.nn.functional as F
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+from src.device import device
 
 
 def accuracy_check(loader, model):
     sig = F.sigmoid
     num_samples = 0
-    total = torch.zeros(1)
+    total = torch.zeros(1).to(device)
     for images, labels in loader:
         labels, images = labels.to(device), images.to(device)
         outputs = model(images).detach()

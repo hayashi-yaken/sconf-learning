@@ -7,11 +7,10 @@ Provides a reusable training function shared across experiment scripts.
 """
 import torch
 
+from src.device import device
 from src.models import mlp_model
 from src.losses import Sconf_loss
 from src.engine.evaluate import accuracy_check
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def train_sconf_one_run(sconf_loader, test_loader, prior,

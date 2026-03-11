@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import torch
 
+from src.device import device
 from src.data import prepare_mnist_data
 from src.engine import train_sconf_one_run
 from src.utils import save_training_curves
