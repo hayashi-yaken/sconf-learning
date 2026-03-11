@@ -24,6 +24,7 @@ from src.data import prepare_mnist_data
 from src.models import mlp_model
 from src.losses import Sconf_loss
 from src.engine import accuracy_check
+from src.utils import save_training_curves
 
 warnings.filterwarnings("ignore")
 
@@ -106,11 +107,11 @@ optimizer = torch.optim.Adam(
 # ---------------------------------------------------------------------------
 # Training loop
 # ---------------------------------------------------------------------------
-results = []  # list of (epoch, test_accuracy)
+results = []  # list of {'epoch', 'train_loss', 'test_accuracy'}
 
 test_accuracy = accuracy_check(loader=test_loader, model=model).to("cpu")
-print(f"Epoch: 0. Test Accuracy: {test_accuracy.numpy()[0]:.2f}%")
-results.append((0, float(test_accuracy.numpy()[0])))
+print(f"Epoch: 0. Train Loss: -      Test Accuracy: {test_accuracy.numpy()[0]:.2f}%")
+results.append({'epoch': 0, 'train_loss': float('nan'), 'test_accuracy': float(test_accuracy.numpy()[0])})
 
 for epoch in range(1, args.epochs):
     # Learning rate schedule (mirrors demo.py)
@@ -122,6 +123,7 @@ for epoch in range(1, args.epochs):
             pg['lr'] /= 10
 
     model.train()
+    total_loss, n_batches = 0.0, 0
     for images, sconf in sconf_loader:
         images, sconf = images.to(device), sconf.to(device)
         optimizer.zero_grad()
@@ -129,13 +131,16 @@ for epoch in range(1, args.epochs):
         loss = Sconf_loss(f=outputs, prior=prior, sconf=sconf, loss_name=args.method)
         loss.backward()
         optimizer.step()
+        total_loss += loss.item()
+        n_batches += 1
+    train_loss = total_loss / n_batches
 
     model.eval()
     with torch.no_grad():
         test_accuracy = accuracy_check(loader=test_loader, model=model).to("cpu")
         acc = float(test_accuracy.numpy()[0])
-    print(f"Epoch: {epoch}. Test Accuracy: {acc:.2f}%")
-    results.append((epoch, acc))
+    print(f"Epoch: {epoch}. Train Loss: {train_loss:.4f}  Test Accuracy: {acc:.2f}%")
+    results.append({'epoch': epoch, 'train_loss': train_loss, 'test_accuracy': acc})
 
 # ---------------------------------------------------------------------------
 # Save results to CSV
@@ -147,10 +152,17 @@ if args.pair_strategy == 'anchor_type1':
 else:
     filename = f"iid_npairs{args.n_pairs}_seed{args.seed}.csv"
 
-output_path = os.path.join(args.output_dir, filename)
-with open(output_path, 'w', newline='') as f:
-    writer = csv.writer(f)
-    writer.writerow(['epoch', 'test_accuracy'])
+stem = filename.replace('.csv', '')
+csv_path = os.path.join(args.output_dir, filename)
+plot_path = os.path.join(args.output_dir, f"{stem}.png")
+
+with open(csv_path, 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=['epoch', 'train_loss', 'test_accuracy'])
+    writer.writeheader()
     writer.writerows(results)
 
-print(f"\n[INFO] Results saved to: {output_path}")
+plot_title = f"{args.pair_strategy} | method={args.method} | K={args.K} | n_pairs={args.n_pairs} | seed={args.seed}"
+save_training_curves(results, plot_path, title=plot_title)
+
+print(f"\n[INFO] CSV   saved to: {csv_path}")
+print(f"[INFO] Plot  saved to: {plot_path}")
