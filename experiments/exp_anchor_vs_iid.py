@@ -1,15 +1,13 @@
 """
-アンカー型ペア生成 vs i.i.d Baseline の比較実験
 Comparison experiment: anchor-type pair generation vs i.i.d baseline
 
-エポックごとのテスト精度を CSV に保存する。
 Saves per-epoch test accuracy to a CSV file.
 
-使用例 / Usage:
+Usage:
     # i.i.d Baseline
     python experiments/exp_anchor_vs_iid.py --pair_strategy iid --seed 0 --epochs 3
 
-    # アンカー型 Type1 / Anchor-type 1
+    # Anchor-type 1
     python experiments/exp_anchor_vs_iid.py --pair_strategy anchor_type1 --K 100 --n_pairs 30000 --seed 0 --epochs 3
 """
 import argparse

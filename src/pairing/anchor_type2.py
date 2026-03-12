@@ -1,11 +1,10 @@
 """
-アンカー型 Type2 のペア生成（実装予定）
+Anchor-type 2 pair generation (not yet implemented)
 
-アンカー集合 {a_1, ..., a_K} を固定し、
-アンカー同士のペアも含めて構築する。
-Type1 より間接的な類似度情報が多くなる。
+Fix an anchor set {a_1, ..., a_K} and build pairs including anchor-anchor pairs.
+Contains more indirect similarity information than Type 1.
 """
 
 
 def create_anchor_type2_pairs(data, label, anchors, n_pairs_per_anchor, **kwargs):
-    raise NotImplementedError("アンカー型 Type2 は未実装です")
+    raise NotImplementedError("Anchor-type 2 is not yet implemented")

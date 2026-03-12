@@ -3,7 +3,7 @@ import torch
 
 
 class PairDataset(object):
-    """画像ペアと二値 SD ラベルの Dataset。"""
+    """Dataset of image pairs and binary SD labels."""
     def __init__(self, x0, x1, label):
         self.size = label.shape[0]
         self.x0 = torch.from_numpy(x0)
@@ -18,7 +18,7 @@ class PairDataset(object):
 
 
 def create_iid_pairs(data, label, perm):
-    """i.i.d ランダムペアの PairDataset を作成する（Baseline）。"""
+    """Create a PairDataset of i.i.d random pairs (Baseline)."""
     x0_data = []
     x1_data = []
     label_sd = []

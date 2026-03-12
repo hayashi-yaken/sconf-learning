@@ -1,8 +1,6 @@
 """
-Sconf 学習の1回分のトレーニングループ
 Single training run for Sconf-based loss methods
 
-複数実験で共通して使える学習関数を提供する。
 Provides a reusable training function shared across experiment scripts.
 """
 import torch
@@ -15,31 +13,22 @@ from src.engine.evaluate import accuracy_check
 
 def train_sconf_one_run(sconf_loader, test_loader, prior,
                         method='u', lr=1e-3, weight_decay=1e-3, epochs=60):
-    """Sconf 損失を使った1回分の学習を実行し、エポックごとの記録を返す。
-    Run a single training session with Sconf loss and return per-epoch records.
+    """Run a single training session with Sconf loss and return per-epoch records.
 
     Args:
-        sconf_loader: Sconf 値付きの訓練データローダー /
-            Training data loader with per-sample sconf values.
-        test_loader: テストデータローダー /
-            Test data loader.
-        prior (torch.Tensor): 事前確率 /
-            Class prior probability.
-        method (str): 損失バリアント 'u' | 'abs' | 'nn' (default: 'u') /
-            Loss variant 'u' | 'abs' | 'nn' (default: 'u').
-        lr (float): 学習率 (default: 1e-3) /
-            Learning rate (default: 1e-3).
-        weight_decay (float): 重み減衰 (default: 1e-3) /
-            Weight decay (default: 1e-3).
-        epochs (int): エポック数 (default: 60) /
-            Number of training epochs (default: 60).
+        sconf_loader: Training data loader with per-sample sconf values.
+        test_loader: Test data loader.
+        prior (torch.Tensor): Class prior probability.
+        method (str): Loss variant 'u' | 'abs' | 'nn' (default: 'u').
+        lr (float): Learning rate (default: 1e-3).
+        weight_decay (float): Weight decay (default: 1e-3).
+        epochs (int): Number of training epochs (default: 60).
 
     Returns:
-        list[dict]: エポックごとの記録。各 dict は以下のキーを持つ。 /
-            Per-epoch records. Each dict has the following keys:
+        list[dict]: Per-epoch records. Each dict has the following keys:
             - 'epoch' (int)
-            - 'train_loss' (float): エポック平均 train loss / Mean train loss
-            - 'test_accuracy' (float): テスト精度（%） / Test accuracy (%)
+            - 'train_loss' (float): Mean train loss
+            - 'test_accuracy' (float): Test accuracy (%)
     """
     model = mlp_model(input_dim=28 * 28, hidden_dim=500, output_dim=1).to(device)
     optimizer = torch.optim.Adam(

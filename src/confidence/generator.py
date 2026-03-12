@@ -1,12 +1,11 @@
 import torch
 from src.models import mlp_model
 from src.losses import logistic
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+from src.device import device
 
 
 def confidence_generator(train_loader, v_train_loader):
-    """真のラベルを使って補助MLPを学習し、各サンプルの信頼度 p_i を生成する。"""
+    """Train an auxiliary MLP with true labels and return per-sample confidence scores p_i."""
     model = mlp_model(input_dim=28 * 28, hidden_dim=500, output_dim=1)
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)

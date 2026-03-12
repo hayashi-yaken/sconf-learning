@@ -1,16 +1,15 @@
 """
-アンカー数 K を 1〜100 でスイープする比較実験
 Sweep experiment varying anchor count K from 1 to 100
 
-設定 / Configuration:
-    - method: u / abs / nn（全3種）
-    - K: 1〜100（1刻み）
-    - n_pairs: 30000（固定）
-    - seed: 0〜9（10回）
-    - epochs: 60（固定）
-    - bias: なし（K_pos / K_neg 未指定）
+Configuration:
+    - method: u / abs / nn (all 3 variants)
+    - K: 1 to 100 (step 1)
+    - n_pairs: 30000 (fixed)
+    - seed: 0 to 9 (10 runs)
+    - epochs: 60 (fixed)
+    - bias: none (K_pos / K_neg not specified)
 
-出力 / Output:
+Output:
     outputs/sweep_anchor_K/
         {method}_K{K:03d}_seed{seed}.csv
         {method}_K{K:03d}_seed{seed}.png

@@ -1,8 +1,6 @@
 """
-学習曲線の可視化ユーティリティ
 Training curve visualization utilities
 
-エポックごとの train loss / test accuracy をグラフとして保存する。
 Saves per-epoch train loss and test accuracy as plot images.
 """
 import os
@@ -11,19 +9,15 @@ import matplotlib.pyplot as plt
 
 
 def save_training_curves(results, output_path, title=None):
-    """学習曲線（train loss / test accuracy）をグラフ画像として保存する。
-    Save training curves (train loss / test accuracy) as a plot image.
+    """Save training curves (train loss / test accuracy) as a plot image.
 
     Args:
-        results (list[dict]): エポックごとの記録。各要素は以下のキーを持つ dict。 /
-            Per-epoch records. Each element is a dict with the following keys:
-            - 'epoch' (int): エポック番号 / Epoch number
-            - 'train_loss' (float): エポック平均 train loss / Mean train loss for the epoch
-            - 'test_accuracy' (float): テスト精度（%） / Test accuracy (%)
-        output_path (str): 保存先のファイルパス（拡張子含む） /
-            Destination file path (including extension, e.g. .png).
-        title (str or None): グラフのタイトル。None の場合はタイトルなし。 /
-            Plot title. If None, no title is shown.
+        results (list[dict]): Per-epoch records. Each element is a dict with the following keys:
+            - 'epoch' (int): Epoch number
+            - 'train_loss' (float): Mean train loss for the epoch
+            - 'test_accuracy' (float): Test accuracy (%)
+        output_path (str): Destination file path (including extension, e.g. .png).
+        title (str or None): Plot title. If None, no title is shown.
     """
     epochs = [r['epoch'] for r in results]
     train_losses = [r['train_loss'] for r in results]
