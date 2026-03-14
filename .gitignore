@@ -1,6 +1,8 @@
 __pycache__/
-datasets/
 
 .claude/
 AGENTS.md
 CLAUDE.md
+
+datasets/
+outputs/
