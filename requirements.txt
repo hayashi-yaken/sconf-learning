@@ -1,0 +1,6 @@
+matplotlib
+
+# optional
+pre-commit
+ruff
+black
