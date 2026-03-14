@@ -9,7 +9,7 @@ PAIR_STRATEGIES = {
 }
 
 # Strategies that provide custom sconf training data for sconf_loader.
-# iid is absent because datamodule handles it with the existing perm-based code.
+# iid is absent because src.data.pipeline handles it with the existing perm-based code.
 SCONF_DATA_STRATEGIES = {
     'anchor_type1': create_anchor_sconf_data,
 }
@@ -34,7 +34,7 @@ def get_pair_dataset(strategy, data, label, perm, **kwargs):
 def get_sconf_training_data(strategy, data, label, perm, **kwargs):
     """Returns flat (images, sconf_values) for building sconf_loader in anchor strategies.
 
-    Returns None for 'iid' (datamodule falls back to its own perm-based computation).
+    Returns None for 'iid' (src.data.pipeline falls back to its own perm-based computation).
 
     Args:
         strategy (str): 'iid' | 'anchor_type1' | 'anchor_type2'
