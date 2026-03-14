@@ -103,7 +103,7 @@ print()
 # Main sweep loop
 # ---------------------------------------------------------------------------
 run_idx = 0
-for method, K, train_seed, pair_seed in itertools.product(args.methods, K_values, train_seeds, pair_seeds):
+for method, K, pair_seed, train_seed in itertools.product(args.methods, K_values, pair_seeds, train_seeds):
     run_idx += 1
     stem = f"{method}_K{K:03d}_tseed{train_seed}_pseed{pair_seed}"
     csv_path = os.path.join(args.output_dir, f"{stem}.csv")
@@ -137,7 +137,7 @@ for method, K, train_seed, pair_seed in itertools.product(args.methods, K_values
 
     wandb_run = None
     if args.wandb:
-        group = f"{args.wandb_group}_{method}_K{K:03d}_tseed{train_seed}"
+        group = f"{args.wandb_group}_{method}_K{K:03d}_pseed{pair_seed}"
         wandb_run = init_wandb_run(
             {
                 "script": "experiments/sweep_anchor_K.py",
