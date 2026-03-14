@@ -3,7 +3,7 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 
 
-def load_mnist_binary(root='./data/mnist'):
+def load_mnist_binary(root='./datasets'):
     """Load MNIST and binarize labels (0-6 -> +1, 7-9 -> -1)."""
     ordinary_train_dataset = dsets.MNIST(
         root=root, train=True, transform=transforms.ToTensor(), download=True

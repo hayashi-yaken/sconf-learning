@@ -30,13 +30,14 @@ def generate_confidence_scores(train_loader, v_train_loader):
     return conf
 
 
-def prepare_mnist_data(batch_size, pair_strategy='iid', pair_kwargs=None):
+def prepare_mnist_data(batch_size, pair_strategy='iid', pair_kwargs=None, pair_csv_path=None):
     """MNIST data pipeline.
 
     Args:
         batch_size (int): Batch size
         pair_strategy (str): Pair generation strategy 'iid' | 'anchor_type1' | 'anchor_type2'
         pair_kwargs (dict or None): Additional keyword arguments passed to the pair generation function
+        pair_csv_path (str or None): If provided, save pair dataset metadata to this CSV path.
 
     Returns:
         v_train_loader, sconf_loader, test_loader, sd_loader, pair_loader, prior
@@ -105,6 +106,8 @@ def prepare_mnist_data(batch_size, pair_strategy='iid', pair_kwargs=None):
         true_labels=labels.numpy(),
         **pair_kwargs
     )
+    if pair_csv_path is not None and hasattr(pair_dataset, "save_csv"):
+        pair_dataset.save_csv(pair_csv_path)
     pair_loader = torch.utils.data.DataLoader(
         pair_dataset, batch_size=batch_size, shuffle=True
     )

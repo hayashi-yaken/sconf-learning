@@ -47,6 +47,8 @@ parser.add_argument('--K_pos', type=int, default=None,
                     help='Number of positive-class anchors (None = random selection)')
 parser.add_argument('--K_neg', type=int, default=None,
                     help='Number of negative-class anchors (None = random selection)')
+parser.add_argument('--anchor_indices', type=str, default=None,
+                    help='Comma-separated anchor sample indices (overrides random anchor selection)')
 parser.add_argument('-lr', '--learning_rate', type=float, default=1e-3,
                     help='Learning rate (default: 1e-3)')
 parser.add_argument('-bs', '--batch_size', type=int, default=3000,
@@ -59,6 +61,8 @@ parser.add_argument('--seed', type=int, default=0,
                     help='Random seed (default: 0)')
 parser.add_argument('--output_dir', type=str, default='./outputs',
                     help='Directory to save results (default: ./outputs)')
+parser.add_argument('--save_pair_csv', action='store_true',
+                    help='Save generated pair dataset metadata as CSV')
 
 args = parser.parse_args()
 
@@ -79,10 +83,15 @@ pair_kwargs = {}
 if args.pair_strategy == 'anchor_type1':
     pair_kwargs['n_pairs'] = args.n_pairs
     pair_kwargs['K'] = args.K
+    pair_kwargs['seed'] = args.seed
     if args.K_pos is not None:
         pair_kwargs['K_pos'] = args.K_pos
     if args.K_neg is not None:
         pair_kwargs['K_neg'] = args.K_neg
+    if args.anchor_indices is not None:
+        pair_kwargs['anchor_indices'] = [
+            int(idx.strip()) for idx in args.anchor_indices.split(',') if idx.strip()
+        ]
 
 # ---------------------------------------------------------------------------
 # Data preparation
@@ -90,10 +99,20 @@ if args.pair_strategy == 'anchor_type1':
 print(f"[INFO] pair_strategy={args.pair_strategy}, method={args.method}, seed={args.seed}")
 print(f"[INFO] pair_kwargs={pair_kwargs}")
 
+os.makedirs(args.output_dir, exist_ok=True)
+pair_csv_path = None
+if args.save_pair_csv:
+    if args.pair_strategy == 'anchor_type1':
+        pair_csv_name = f"anchor_type1_K{args.K}_npairs{args.n_pairs}_seed{args.seed}_pairs.csv"
+    else:
+        pair_csv_name = f"iid_npairs{args.n_pairs}_seed{args.seed}_pairs.csv"
+    pair_csv_path = os.path.join(args.output_dir, pair_csv_name)
+
 v_train_loader, sconf_loader, test_loader, sd_loader, pair_loader, prior = prepare_mnist_data(
     batch_size=args.batch_size,
     pair_strategy=args.pair_strategy,
     pair_kwargs=pair_kwargs,
+    pair_csv_path=pair_csv_path,
 )
 
 # ---------------------------------------------------------------------------
@@ -116,8 +135,6 @@ for r in results:
 # ---------------------------------------------------------------------------
 # Save results to CSV
 # ---------------------------------------------------------------------------
-os.makedirs(args.output_dir, exist_ok=True)
-
 if args.pair_strategy == 'anchor_type1':
     filename = f"anchor_type1_K{args.K}_npairs{args.n_pairs}_seed{args.seed}.csv"
 else:
@@ -137,3 +154,5 @@ save_training_curves(results, plot_path, title=plot_title)
 
 print(f"\n[INFO] CSV   saved to: {csv_path}")
 print(f"[INFO] Plot  saved to: {plot_path}")
+if pair_csv_path is not None:
+    print(f"[INFO] Pairs saved to: {pair_csv_path}")
